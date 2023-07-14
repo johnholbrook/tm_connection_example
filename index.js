@@ -27,7 +27,7 @@ async function main(){
         let cmd = await prompt("Enter command or h for help: ");
 
         if (cmd == "n"){ // queue next match
-
+            tm.queueNextMatch();
         }
         else if (cmd == "p"){ // queue previous match
             console.log("Not yet supported");

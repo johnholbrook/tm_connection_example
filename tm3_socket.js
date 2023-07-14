@@ -190,9 +190,13 @@ module.exports = class TM3Socket{
         console.log(decoded);
     }
 
-
+    /**
+     * Send a "FieldSetRequest" message to TM
+     * @param {Object} msg - Object representing a valid "FieldSetRequest" message
+     */
     _sendFSRequest(msg){
         let buffer = this.fs_request.encode(msg).finish();
+        console.log(buffer);
         let mangled = this._mangle(buffer);
         this._send(mangled);
     }
@@ -207,14 +211,14 @@ module.exports = class TM3Socket{
      * 4 - reset timer
      */
     _sendFCRequest(value){
-        let message = {
+        let msg = {
             fieldControl: {
                 id: value,
                 fieldId: this.currentFieldId
             }
         };
 
-        this._sendFSRequest(message);
+        this._sendFSRequest(msg);
     }
 
     startMatch(){
@@ -231,5 +235,13 @@ module.exports = class TM3Socket{
 
     resetTimer(){
         this._sendFCRequest(4);
+    }
+
+    queueNextMatch(){
+        let msg = {
+            queueMatch: 1
+        }
+
+        this._sendFSRequest(msg);
     }
 }
