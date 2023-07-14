@@ -33,7 +33,8 @@ module.exports = class TM3Socket{
     
         this.pb = null; // protobuf schema
         this.fs_notice = null; // protobuf message type "FieldSetNotice"
-        this.fs_request = null; // protobuf message tytpe "FieldSetRequest"
+        this.fs_request = null; // protobuf message type "FieldSetRequest"
+        this.fc_request = null; // protobuf message type "FieldControlRequest"
 
     }
 
@@ -79,6 +80,7 @@ module.exports = class TM3Socket{
         this.pb = await protobuf.load("fieldset.proto");
         this.fs_notice = this.pb.lookupType("FieldSetNotice");
         this.fs_request = this.pb.lookupType("FieldSetRequest");
+        // this.fc_request = this.pb.lookupType("FieldControlRequest");
 
         this.websocket = new WebSocket(`ws://${this.addr}/fieldsets/${this.fs}`, {
             headers: {
@@ -182,28 +184,52 @@ module.exports = class TM3Socket{
 
         // update current field ID if needed
         if (decoded.id == 8){
-            this.currentFieldId = Number(decoded.fieldId);
-            console.log(`Field ID: ${this.currentFieldId}`);
+            this.currentFieldId = decoded.fieldId;
         }
 
         console.log(decoded);
     }
 
+
     _sendFSRequest(msg){
-        // console.log(msg);
-        let request = this.fs_request.create(msg);
-        console.log(request);
-        let buffer = this.fs_request.encode(request);
-        return buffer;
+        let buffer = this.fs_request.encode(msg).finish();
+        let mangled = this._mangle(buffer);
+        this._send(mangled);
     }
 
-    async startMatch(){
+    /**
+     * Construct and send a "FieldControlRequest" with the specified value
+     * @param {Number} value - value to send. Meanings are:
+     * 0 - none (idk what this does yet)
+     * 1 - start match
+     * 2 - end early
+     * 3 - abort
+     * 4 - reset timer
+     */
+    _sendFCRequest(value){
         let message = {
-            id: 1,
-            fieldId: this.currentFieldId
-            // field_id: 2
+            fieldControl: {
+                id: value,
+                fieldId: this.currentFieldId
+            }
         };
 
-        console.log(this._sendFSRequest(message));
+        this._sendFSRequest(message);
+    }
+
+    startMatch(){
+        this._sendFCRequest(1);
+    }
+
+    endEarly(){
+        this._sendFCRequest(2)
+    }
+
+    abortMatch(){
+        this._sendFCRequest(3);
+    }
+
+    resetTimer(){
+        this._sendFCRequest(4);
     }
 }

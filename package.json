@@ -4,7 +4,8 @@
   "description": "Example implementation of talking to VEX Tournament Manager via WebSockets, sending and recieving information about field control.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
