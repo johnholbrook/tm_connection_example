@@ -44,6 +44,9 @@ async function main(){
         else if (cmd == "r"){ // reset timer 
             tm.resetTimer();
         }
+        else if (cmd == "t"){
+            tm.test();
+        }
         else if (cmd == "q"){
             process.exit();
         }

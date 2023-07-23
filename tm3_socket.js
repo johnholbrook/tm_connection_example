@@ -187,7 +187,7 @@ module.exports = class TM3Socket{
             this.currentFieldId = decoded.fieldId;
         }
 
-        console.log(decoded);
+        console.log(decoded.toJSON());
     }
 
     /**
@@ -204,7 +204,7 @@ module.exports = class TM3Socket{
     /**
      * Construct and send a "FieldControlRequest" with the specified value
      * @param {Number} value - value to send. Meanings are:
-     * 0 - none (idk what this does yet)
+     * 0 - none (presumably this does nothing)
      * 1 - start match
      * 2 - end early
      * 3 - abort
@@ -240,6 +240,14 @@ module.exports = class TM3Socket{
     queueNextMatch(){
         let msg = {
             queueMatch: 1
+        }
+
+        this._sendFSRequest(msg);
+    }
+
+    test(){
+        let msg = {
+            queueMatch: 3
         }
 
         this._sendFSRequest(msg);
